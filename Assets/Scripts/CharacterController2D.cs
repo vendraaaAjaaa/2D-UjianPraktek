@@ -40,17 +40,17 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private float wallSlideSpeed = 2f;
 
 	// 7. Glide Parameters
-	[Header("Glide Parameters")]
-	[SerializeField] private float glideDuration = 2f;
-	[SerializeField] private float glideStaminaCost = 15f;
-	private float glideTimer = 0f;
-	private bool isGliding = false;
+	// [Header("Glide Parameters")]
+	// [SerializeField] private float glideDuration = 2f;
+	// [SerializeField] private float glideStaminaCost = 15f;
+	// private float glideTimer = 0f;
+	// private bool isGliding = false;
 
 	// 8. Stamina Parameters
-	[Header("Stamina Parameters")]
-	[SerializeField] private float maxStamina = 100f;
-	[SerializeField] private float staminaRegenRate = 10f;
-	private float currentStamina;
+	// [Header("Stamina Parameters")]
+	// [SerializeField] private float maxStamina = 100f;
+	// [SerializeField] private float stami naRegenRate = 10f;
+	// private float currentStamina;
 
 	// 9. Ground and Wall Check
 	[Header("Ground and Wall Check")]
@@ -88,7 +88,7 @@ public class CharacterController2D : MonoBehaviour
 
 	private void Start()
 	{
-		currentStamina = maxStamina;
+		// currentStamina = maxStamina;
 		doubleJumpsLeft = maxDoubleJumps;
 	}
 
@@ -96,7 +96,7 @@ public class CharacterController2D : MonoBehaviour
 	{
 		HandleInput();
 		HandleDashCooldown();
-		HandleStaminaRegen();
+		// HandleStaminaRegen();
 	}
 
 	private void FixedUpdate()
@@ -105,9 +105,9 @@ public class CharacterController2D : MonoBehaviour
 		CheckWall();
 		HandleMovement();
 		HandleJump();
-		HandleDash();
+		// HandleDash();
 		HandleWallSlide();
-		HandleGlide();
+		// HandleGlide();
 		HandleWallJumping();
 	}
 
@@ -118,6 +118,11 @@ public class CharacterController2D : MonoBehaviour
 	{
 		// Horizontal Movement Input
 		horizontalInput = Input.GetAxisRaw("Horizontal");
+		
+		if (Input.GetKeyDown(KeyCode.Space))
+		{
+			jumpPressed = true;
+		}
 
 		// Reset double jumps when grounded
 		if (isGrounded)
@@ -126,15 +131,15 @@ public class CharacterController2D : MonoBehaviour
 		}
 
 		// Glide Activation
-		if (Input.GetKey(KeyCode.Space) && rb.velocity.y < 0)
-		{
-			if (currentStamina >= glideStaminaCost && glideTimer <= 0f && !isGliding)
-			{
-				isGliding = true;
-				glideTimer = glideDuration;
-				currentStamina -= glideStaminaCost;
-			}
-		}
+		// if (Input.GetKey(KeyCode.Space) && rb.velocity.y < 0)
+		// {
+		// 	if (currentStamina >= glideStaminaCost && glideTimer <= 0f && !isGliding)
+		// 	{
+		// 		isGliding = true;
+		// 		glideTimer = glideDuration;
+		// 		currentStamina -= glideStaminaCost;
+		// 	}
+		// }
 	}
 
 	/// <summary>
@@ -181,16 +186,20 @@ public class CharacterController2D : MonoBehaviour
 	/// </summary>
 	private void HandleJump()
 	{
-		if (Input.GetKeyDown(KeyCode.Space))
+		if (jumpPressed)
 		{
-			if (isGrounded)
+			if (Input.GetKeyDown(KeyCode.Space))
 			{
-				rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
-			}
-			else if (doubleJumpsLeft > 0)
-			{
-				rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
-				doubleJumpsLeft--;
+				if (isGrounded)
+				{
+					rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
+					Debug.Log(isGrounded);
+				}
+				else if (doubleJumpsLeft > 0)
+				{
+					rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
+					doubleJumpsLeft--;
+				}
 			}
 		}
 
@@ -204,33 +213,33 @@ public class CharacterController2D : MonoBehaviour
 	/// <summary>
 	/// Handles dashing mechanics.
 	/// </summary>
-	private void HandleDash()
-	{
-		if (dashTimer > 0f)
-		{
-			dashTimer -= Time.fixedDeltaTime;
-		}
+	// private void HandleDash()
+	// {
+	// 	if (dashTimer > 0f)
+	// 	{
+	// 		dashTimer -= Time.fixedDeltaTime;
+	// 	}
 
-		if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
-		{
-			if (currentStamina >= dashStaminaCost && dashTimer <= 0f)
-			{
-				Dash(horizontalInput);
-				currentStamina -= dashStaminaCost;
-				dashTimer = dashCooldown;
-			}
-		}
-	}
+	// 	if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+	// 	{
+	// 		if (currentStamina >= dashStaminaCost && dashTimer <= 0f)
+	// 		{
+	// 			Dash(horizontalInput);
+	// 			currentStamina -= dashStaminaCost;
+	// 			dashTimer = dashCooldown;
+	// 		}
+	// 	}
+	// }
 
 	/// <summary>
 	/// Executes the dash movement.
 	/// </summary>
 	/// <param name="direction">Direction to dash.</param>
-	private void Dash(float direction)
-	{
-		Vector2 dashVelocity = new Vector2(dashDistance * direction, rb.velocity.y);
-		rb.velocity = dashVelocity;
-	}
+	// private void Dash(float direction)
+	// {
+	// 	Vector2 dashVelocity = new Vector2(dashDistance * direction, rb.velocity.y);
+	// 	rb.velocity = dashVelocity;
+	// }
 
 	/// <summary>
 	/// Handles wall sliding mechanics.
@@ -246,22 +255,22 @@ public class CharacterController2D : MonoBehaviour
 	/// <summary>
 	/// Handles gliding mechanics.
 	/// </summary>
-	private void HandleGlide()
-	{
-		if (isGliding)
-		{
-			if (glideTimer > 0f)
-			{
-				rb.gravityScale = gravityScale * 0.5f; // Reduce gravity during glide
-				glideTimer -= Time.fixedDeltaTime;
-			}
-			else
-			{
-				isGliding = false;
-				rb.gravityScale = gravityScale; // Reset gravity
-			}
-		}
-	}
+	// private void HandleGlide()
+	// {
+	// 	if (isGliding)
+	// 	{
+	// 		if (glideTimer > 0f)
+	// 		{
+	// 			rb.gravityScale = gravityScale * 0.5f; // Reduce gravity during glide
+	// 			glideTimer -= Time.fixedDeltaTime;
+	// 		}
+	// 		else
+	// 		{
+	// 			isGliding = false;
+	// 			rb.gravityScale = gravityScale; // Reset gravity
+	// 		}
+	// 	}
+	// }
 
 	/// <summary>
 	/// Checks if the player is grounded.
@@ -299,14 +308,14 @@ public class CharacterController2D : MonoBehaviour
 	/// <summary>
 	/// Handles stamina regeneration.
 	/// </summary>
-	private void HandleStaminaRegen()
-	{
-		if ((!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) && !isGliding)
-		{
-			currentStamina += staminaRegenRate * Time.fixedDeltaTime;
-			currentStamina = Mathf.Clamp(currentStamina, 0f, maxStamina);
-		}
-	}
+	// private void HandleStaminaRegen()
+	// {
+	// 	if ((!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) && !isGliding)
+	// 	{
+	// 		currentStamina += staminaRegenRate * Time.fixedDeltaTime;
+	// 		currentStamina = Mathf.Clamp(currentStamina, 0f, maxStamina);
+	// 	}
+	// }
 
 	/// <summary>
 	/// Handles dash cooldown management.
