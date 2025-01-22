@@ -2,340 +2,148 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class CharacterController2D : MonoBehaviour
 {
-	// 1. Movement Parameters
-	[Header("Movement Parameters")]
-	[SerializeField] private float walkSpeed = 5f;
-	[SerializeField] private float runSpeed = 8f;
-	[SerializeField] private float acceleration = 10f;
-	[SerializeField] private float deceleration = 15f;
+	[SerializeField] private float m_JumpForce = 400f;							// Amount of force added when the player jumps.
+	[Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;			// Amount of maxSpeed applied to crouching movement. 1 = 100%
+	[Range(0, .3f)] [SerializeField] private float m_MovementSmoothing = .05f;	// How much to smooth out the movement
+	[SerializeField] private bool m_AirControl = false;							// Whether or not a player can steer while jumping;
+	[SerializeField] private LayerMask m_WhatIsGround;							// A mask determining what is ground to the character
+	[SerializeField] private Transform m_GroundCheck;							// A position marking where to check if the player is grounded.
+	[SerializeField] private Transform m_CeilingCheck;							// A position marking where to check for ceilings
+	[SerializeField] private Collider2D m_CrouchDisableCollider;				// A collider that will be disabled when crouching
 
-	// 2. Jump Parameters
-	[Header("Jump Parameters")]
-	[SerializeField] private float jumpVelocity = 12f;
-	[SerializeField] private float gravityScale = 3f;
-	[SerializeField] private float maxJumpHeight = 4f;
+	const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
+	private bool m_Grounded;            // Whether or not the player is grounded.
+	const float k_CeilingRadius = .2f; // Radius of the overlap circle to determine if the player can stand up
+	private Rigidbody2D m_Rigidbody2D;
+	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
+	private Vector3 m_Velocity = Vector3.zero;
 
-	// 3. Double Jump Parameters
-	[Header("Double Jump Parameters")]
-	[SerializeField] private int maxDoubleJumps = 1;
-	private int doubleJumpsLeft;
+	[Header("Events")]
+	[Space]
 
-	// 4. Dash Parameters
-	[Header("Dash Parameters")]
-	[SerializeField] private float dashDistance = 3f;
-	[SerializeField] private float dashCooldown = 1.5f;
-	[SerializeField] private float dashStaminaCost = 20f;
-	private float dashTimer = 0f;
+	public UnityEvent OnLandEvent;
 
-	// 5. Wall Jump Parameters
-	[Header("Wall Jump Parameters")]
-	[SerializeField] private float wallJumpVelocity = 10f;
-	[SerializeField] private float wallJumpDirection = 5f; // Horizontal velocity when wall jumping
+	[System.Serializable]
+	public class BoolEvent : UnityEvent<bool> { }
 
-	// 6. Wall Slide Parameters
-	[Header("Wall Slide Parameters")]
-	[SerializeField] private float wallSlideSpeed = 2f;
-
-	// 7. Glide Parameters
-	// [Header("Glide Parameters")]
-	// [SerializeField] private float glideDuration = 2f;
-	// [SerializeField] private float glideStaminaCost = 15f;
-	// private float glideTimer = 0f;
-	// private bool isGliding = false;
-
-	// 8. Stamina Parameters
-	// [Header("Stamina Parameters")]
-	// [SerializeField] private float maxStamina = 100f;
-	// [SerializeField] private float stami naRegenRate = 10f;
-	// private float currentStamina;
-
-	// 9. Ground and Wall Check
-	[Header("Ground and Wall Check")]
-	[SerializeField] private Transform groundCheck;
-	[SerializeField] private float groundCheckRadius = 0.2f;
-	[SerializeField] private LayerMask groundLayer;
-
-	[SerializeField] private Transform wallCheck;
-	[SerializeField] private float wallCheckDistance = 0.5f;
-	private bool isGrounded;
-	private bool isTouchingWall;
-	private bool isTouchingWallLeft;
-	private bool isTouchingWallRight;
-
-	// 10. Movement Variables
-	private float horizontalInput;
-	private float targetSpeed;
-	private float velocityX;
-
-	private Rigidbody2D rb;
-
-	// 11. State Variables
-	private bool canDoubleJump;
-	private bool isFacingRight = true;
-
-	// 12. Input Variables
-	private bool jumpPressed;
-	private bool dashPressed;
+	public BoolEvent OnCrouchEvent;
+	private bool m_wasCrouching = false;
 
 	private void Awake()
 	{
-		rb = GetComponent<Rigidbody2D>();
-		rb.gravityScale = gravityScale;
-	}
+		m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
-	private void Start()
-	{
-		// currentStamina = maxStamina;
-		doubleJumpsLeft = maxDoubleJumps;
-	}
+		if (OnLandEvent == null)
+			OnLandEvent = new UnityEvent();
 
-	private void Update()
-	{
-		HandleInput();
-		HandleDashCooldown();
-		// HandleStaminaRegen();
+		if (OnCrouchEvent == null)
+			OnCrouchEvent = new BoolEvent();
 	}
 
 	private void FixedUpdate()
 	{
-		CheckGrounded();
-		CheckWall();
-		HandleMovement();
-		HandleJump();
-		// HandleDash();
-		HandleWallSlide();
-		// HandleGlide();
-		HandleWallJumping();
-	}
+		bool wasGrounded = m_Grounded;
+		m_Grounded = false;
 
-	/// <summary>
-	/// Handles player input.
-	/// </summary>
-	private void HandleInput()
-	{
-		// Horizontal Movement Input
-		horizontalInput = Input.GetAxisRaw("Horizontal");
-		
-		if (Input.GetKeyDown(KeyCode.Space))
+		// The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
+		// This can be done using layers instead but Sample Assets will not overwrite your project settings.
+		Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+		for (int i = 0; i < colliders.Length; i++)
 		{
-			jumpPressed = true;
-		}
-
-		// Reset double jumps when grounded
-		if (isGrounded)
-		{
-			doubleJumpsLeft = maxDoubleJumps;
-		}
-
-		// Glide Activation
-		// if (Input.GetKey(KeyCode.Space) && rb.velocity.y < 0)
-		// {
-		// 	if (currentStamina >= glideStaminaCost && glideTimer <= 0f && !isGliding)
-		// 	{
-		// 		isGliding = true;
-		// 		glideTimer = glideDuration;
-		// 		currentStamina -= glideStaminaCost;
-		// 	}
-		// }
-	}
-
-	/// <summary>
-	/// Handles movement including walking and running.
-	/// </summary>
-	private void HandleMovement()
-	{
-		// Determine target speed based on input and run key
-		if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-		{
-			targetSpeed = runSpeed * horizontalInput;
-		}
-		else
-		{
-			targetSpeed = walkSpeed * horizontalInput;
-		}
-
-		// Calculate acceleration or deceleration
-		if (Mathf.Abs(targetSpeed) > Mathf.Abs(velocityX))
-		{
-			velocityX += acceleration * Time.fixedDeltaTime * Mathf.Sign(targetSpeed);
-		}
-		else
-		{
-			velocityX = Mathf.MoveTowards(velocityX, targetSpeed, deceleration * Time.fixedDeltaTime);
-		}
-
-		// Apply horizontal velocity
-		rb.velocity = new Vector2(velocityX, rb.velocity.y);
-
-		// Flip character sprite based on movement direction
-		if (horizontalInput > 0 && !isFacingRight)
-		{
-			Flip();
-		}
-		else if (horizontalInput < 0 && isFacingRight)
-		{
-			Flip();
-		}
-	}
-
-	/// <summary>
-	/// Handles jumping and double jumping.
-	/// </summary>
-	private void HandleJump()
-	{
-		if (jumpPressed)
-		{
-			if (Input.GetKeyDown(KeyCode.Space))
+			if (colliders[i].gameObject != gameObject)
 			{
-				if (isGrounded)
+				m_Grounded = true;
+				if (!wasGrounded)
 				{
-					rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
-					Debug.Log(isGrounded);
+					OnLandEvent.Invoke();
 				}
-				else if (doubleJumpsLeft > 0)
-				{
-					rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
-					doubleJumpsLeft--;
-				}
+			}	
+		}
+	}
+
+
+	public void Move(float move, bool crouch, bool jump)
+	{
+		// If crouching, check to see if the character can stand up
+		if (!crouch)
+		{
+			// If the character has a ceiling preventing them from standing up, keep them crouching
+			if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
+			{
+				crouch = true;
 			}
 		}
 
-		// Variable Jump Height
-		if (Input.GetKeyUp(KeyCode.Space) && rb.velocity.y > 0)
+		//only control the player if grounded or airControl is turned on
+		if (m_Grounded || m_AirControl)
 		{
-			rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+			// If crouching
+			if (crouch)
+			{
+				if (!m_wasCrouching)
+				{
+					m_wasCrouching = true;
+					OnCrouchEvent.Invoke(true);
+				}
+
+				// Reduce the speed by the crouchSpeed multiplier
+				move *= m_CrouchSpeed;
+
+				// Disable one of the colliders when crouching
+				if (m_CrouchDisableCollider != null)
+					m_CrouchDisableCollider.enabled = false;
+			} else
+			{
+				// Enable the collider when not crouching
+				if (m_CrouchDisableCollider != null)
+					m_CrouchDisableCollider.enabled = true;
+
+				if (m_wasCrouching)
+				{
+					m_wasCrouching = false;
+					OnCrouchEvent.Invoke(false);
+				}
+			}
+
+			// Move the character by finding the target velocity
+			Vector3 targetVelocity = new Vector2(move * 10f, m_Rigidbody2D.velocity.y);
+			// And then smoothing it out and applying it to the character
+			m_Rigidbody2D.velocity = Vector3.SmoothDamp(m_Rigidbody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
+
+			// If the input is moving the player right and the player is facing left...
+			if (move > 0 && !m_FacingRight)
+			{
+				// ... flip the player.
+				Flip();
+			}
+			// Otherwise if the input is moving the player left and the player is facing right...
+			else if (move < 0 && m_FacingRight)
+			{
+				// ... flip the player.
+				Flip();
+			}
+		}
+		// If the player should jump...
+		if (m_Grounded && jump)
+		{
+			// Add a vertical force to the player.
+			m_Grounded = false;
+			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
 		}
 	}
 
-	/// <summary>
-	/// Handles dashing mechanics.
-	/// </summary>
-	// private void HandleDash()
-	// {
-	// 	if (dashTimer > 0f)
-	// 	{
-	// 		dashTimer -= Time.fixedDeltaTime;
-	// 	}
 
-	// 	if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
-	// 	{
-	// 		if (currentStamina >= dashStaminaCost && dashTimer <= 0f)
-	// 		{
-	// 			Dash(horizontalInput);
-	// 			currentStamina -= dashStaminaCost;
-	// 			dashTimer = dashCooldown;
-	// 		}
-	// 	}
-	// }
-
-	/// <summary>
-	/// Executes the dash movement.
-	/// </summary>
-	/// <param name="direction">Direction to dash.</param>
-	// private void Dash(float direction)
-	// {
-	// 	Vector2 dashVelocity = new Vector2(dashDistance * direction, rb.velocity.y);
-	// 	rb.velocity = dashVelocity;
-	// }
-
-	/// <summary>
-	/// Handles wall sliding mechanics.
-	/// </summary>
-	private void HandleWallSlide()
-	{
-		if (isTouchingWall && !isGrounded && rb.velocity.y < 0)
-		{
-			rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlideSpeed, float.MaxValue));
-		}
-	}
-
-	/// <summary>
-	/// Handles gliding mechanics.
-	/// </summary>
-	// private void HandleGlide()
-	// {
-	// 	if (isGliding)
-	// 	{
-	// 		if (glideTimer > 0f)
-	// 		{
-	// 			rb.gravityScale = gravityScale * 0.5f; // Reduce gravity during glide
-	// 			glideTimer -= Time.fixedDeltaTime;
-	// 		}
-	// 		else
-	// 		{
-	// 			isGliding = false;
-	// 			rb.gravityScale = gravityScale; // Reset gravity
-	// 		}
-	// 	}
-	// }
-
-	/// <summary>
-	/// Checks if the player is grounded.
-	/// </summary>
-	private void CheckGrounded()
-	{
-		isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-	}
-
-	/// <summary>
-	/// Checks if the player is touching a wall.
-	/// </summary>
-	private void CheckWall()
-	{
-		RaycastHit2D hitLeft = Physics2D.Raycast(wallCheck.position, Vector2.left, wallCheckDistance, groundLayer);
-		RaycastHit2D hitRight = Physics2D.Raycast(wallCheck.position, Vector2.right, wallCheckDistance, groundLayer);
-
-		isTouchingWallLeft = hitLeft.collider != null;
-		isTouchingWallRight = hitRight.collider != null;
-
-		isTouchingWall = isTouchingWallLeft || isTouchingWallRight;
-	}
-
-	/// <summary>
-	/// Flips the character's facing direction.
-	/// </summary>
 	private void Flip()
 	{
-		isFacingRight = !isFacingRight;
-		Vector3 scaler = transform.localScale;
-		scaler.x *= -1;
-		transform.localScale = scaler;
-	}
+		// Switch the way the player is labelled as facing.
+		m_FacingRight = !m_FacingRight;
 
-	/// <summary>
-	/// Handles stamina regeneration.
-	/// </summary>
-	// private void HandleStaminaRegen()
-	// {
-	// 	if ((!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) && !isGliding)
-	// 	{
-	// 		currentStamina += staminaRegenRate * Time.fixedDeltaTime;
-	// 		currentStamina = Mathf.Clamp(currentStamina, 0f, maxStamina);
-	// 	}
-	// }
-
-	/// <summary>
-	/// Handles dash cooldown management.
-	/// </summary>
-	private void HandleDashCooldown()
-	{
-		// Dash cooldown is already managed in HandleDash()
-		// This method can be used for additional cooldown-related logic if needed
-	}
-
-	/// <summary>
-	/// Handles wall jumping mechanics.
-	/// </summary>
-	private void HandleWallJumping()
-	{
-		if (Input.GetKeyDown(KeyCode.Space) && isTouchingWall && !isGrounded)
-		{
-			float wallDirection = isTouchingWallLeft ? 1f : -1f;
-			rb.velocity = new Vector2(wallJumpDirection * wallDirection, wallJumpVelocity);
-			doubleJumpsLeft = maxDoubleJumps; // Reset double jumps upon wall jump
-		}
+		// Multiply the player's x local scale by -1.
+		Vector3 theScale = transform.localScale;
+		theScale.x *= -1;
+		transform.localScale = theScale;
 	}
 }
