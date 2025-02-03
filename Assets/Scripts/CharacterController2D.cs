@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEditor;
 
 public class CharacterController2D : MonoBehaviour
 {
@@ -161,6 +162,7 @@ public class CharacterController2D : MonoBehaviour
 	{
 		bool wasGrounded = m_Grounded;
 		m_Grounded = false;
+		animator.SetBool("isGrounded", false);
 		Debug.Log(m_Grounded);
 
 		// The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
@@ -171,12 +173,19 @@ public class CharacterController2D : MonoBehaviour
 			if (colliders[i].gameObject != gameObject)
 			{
 				m_Grounded = true;
+				animator.SetBool("isGrounded", true);
 				if (!wasGrounded)
 				{
 					OnLandEvent.Invoke();
 				}
 			}
 		}
+	}
+
+	public void OnDrawGizmos()
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawSphere(transform.position - transform.up * 0.848f, k_GroundedRadius);
 	}
 
 	public void PlayerAnimation()
@@ -190,7 +199,7 @@ public class CharacterController2D : MonoBehaviour
 		{
 			isJumping = true;
 			jump = true;
-			animator.SetBool("IsJumping", true);
+			animator.SetTrigger("IsJumping");
 		}
 
 		if (Input.GetButtonDown("Crouch"))
@@ -206,7 +215,6 @@ public class CharacterController2D : MonoBehaviour
 	public void OnLanding()
 	{
 		Debug.Log("Landed");
-		animator.SetBool("IsJumping", false);
 		isJumping = false;
 	}
 
