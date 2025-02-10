@@ -147,6 +147,8 @@ MonoBehaviour:
   m_CrouchDisableCollider: {fileID: 4047231653824709081}
   animator: {fileID: 2224268514525140198}
   runSpeed: 40
+  attackKey: 106
+  attackCooldown: 0.5
   OnLandEvent:
     m_PersistentCalls:
       m_Calls:

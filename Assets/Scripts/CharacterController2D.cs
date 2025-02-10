@@ -22,6 +22,11 @@ public class CharacterController2D : MonoBehaviour
 
 	public float runSpeed = 40f;
 
+	[Header("Attack Settings")]
+	[SerializeField] private KeyCode attackKey = KeyCode.Z; // Bisa diubah di Inspector
+	[SerializeField] private float attackCooldown = 0.5f;
+	private bool canAttack = true;
+
 	float horizontalMove = 0f;
 	bool jump = false;
 	bool crouch = false;
@@ -210,6 +215,21 @@ public class CharacterController2D : MonoBehaviour
 		{
 			crouch = false;
 		}
+		if (Input.GetKeyDown(attackKey) && canAttack && m_Grounded)
+		{
+			StartCoroutine(AttackRoutine());
+		}
+	}
+
+	private IEnumerator AttackRoutine()
+	{
+		canAttack = false;
+		animator.SetTrigger("Attack");
+
+		// Tambahkan logika serangan di sini (misal: enable hitbox)
+
+		yield return new WaitForSeconds(attackCooldown);
+		canAttack = true;
 	}
 
 	public void OnLanding()
