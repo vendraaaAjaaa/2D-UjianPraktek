@@ -218,6 +218,7 @@ public class CharacterController2D : MonoBehaviour
 		if (Input.GetKeyDown(attackKey) && canAttack && m_Grounded)
 		{
 			StartCoroutine(AttackRoutine());
+			animator.SetBool("canAttack", true);
 		}
 	}
 
@@ -226,9 +227,14 @@ public class CharacterController2D : MonoBehaviour
 		canAttack = false;
 		animator.SetTrigger("Attack");
 
+
 		// Tambahkan logika serangan di sini (misal: enable hitbox)
 
 		yield return new WaitForSeconds(attackCooldown);
+
+		animator.SetBool("canAttack", false);
+
+		// animator.ResetTrigger("Attack");
 		canAttack = true;
 	}
 
