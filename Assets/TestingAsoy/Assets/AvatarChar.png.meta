@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9eedfa40a1c23d642b66bcd3a0b29d64
+guid: b78be5dc86fb3a8469fdaad23219ac70
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Walk-Base-Sheet_0
+      name: AvatarChar_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 48
-        height: 32
+        x: 67
+        y: 53
+        width: 42
+        height: 5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,20 +124,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7f7b8132b1da65a4491a32b9a8c1be85
-      internalID: -1037651970
+      spriteID: c49af61453d215743b67e9698f304560
+      internalID: -1511830186
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk-Base-Sheet_1
+      name: AvatarChar_1
       rect:
         serializedVersion: 2
-        x: 48
-        y: 0
-        width: 48
-        height: 32
+        x: 115
+        y: 53
+        width: 42
+        height: 5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,20 +145,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a83bf1b505af8654ca6225af6e72da31
-      internalID: -329790424
+      spriteID: ad6a0f6093bccc247bdc7faceadfe418
+      internalID: 767356054
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk-Base-Sheet_2
+      name: AvatarChar_2
       rect:
         serializedVersion: 2
-        x: 96
-        y: 0
-        width: 48
-        height: 32
+        x: 15
+        y: 15
+        width: 34
+        height: 34
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,20 +166,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2ec142f39c72c774690d1439ac93c2be
-      internalID: 1979567687
+      spriteID: 5941d8ca16c58f24cb894b2afb85df80
+      internalID: -1446106589
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk-Base-Sheet_3
+      name: AvatarChar_3
       rect:
         serializedVersion: 2
-        x: 144
-        y: 0
-        width: 48
-        height: 32
+        x: 67
+        y: 37
+        width: 42
+        height: 5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -187,20 +187,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e01ec9dc9e1fb7a48aaf00f3c2be320c
-      internalID: 1873034771
+      spriteID: a6b92f2560fe86f48bf736765bf0bdbf
+      internalID: 304995593
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk-Base-Sheet_4
+      name: AvatarChar_4
       rect:
         serializedVersion: 2
-        x: 192
-        y: 0
-        width: 48
-        height: 32
+        x: 115
+        y: 37
+        width: 42
+        height: 5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -208,20 +208,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 44086c8e5b461bb4aa3949fcb4c146d8
-      internalID: 1330879856
+      spriteID: 8609d09b7e2cc0141b81d7cec735dce7
+      internalID: -1454688042
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk-Base-Sheet_5
+      name: AvatarChar_5
       rect:
         serializedVersion: 2
-        x: 240
-        y: 0
-        width: 48
-        height: 32
+        x: 163
+        y: 37
+        width: 42
+        height: 5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -229,8 +229,50 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0cc8be679da0c5d41bb5f6bf73b43ccd
-      internalID: -599214381
+      spriteID: 884f79cd37fb9b64882db3eeb655442f
+      internalID: 2098220288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AvatarChar_6
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 21
+        width: 42
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1991d206a40f24e49bf1edf349acda1f
+      internalID: 2023947518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AvatarChar_7
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 21
+        width: 42
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1df70a9da24195c4bb13cd2545c52fbf
+      internalID: 1598873956
       vertices: []
       indices: 
       edges: []
@@ -246,12 +288,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Walk-Base-Sheet_0: -1037651970
-      Walk-Base-Sheet_1: -329790424
-      Walk-Base-Sheet_2: 1979567687
-      Walk-Base-Sheet_3: 1873034771
-      Walk-Base-Sheet_4: 1330879856
-      Walk-Base-Sheet_5: -599214381
+      AvatarChar_0: -1511830186
+      AvatarChar_1: 767356054
+      AvatarChar_2: -1446106589
+      AvatarChar_3: 304995593
+      AvatarChar_4: -1454688042
+      AvatarChar_5: 2098220288
+      AvatarChar_6: 2023947518
+      AvatarChar_7: 1598873956
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

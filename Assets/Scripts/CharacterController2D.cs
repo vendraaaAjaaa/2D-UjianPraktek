@@ -27,6 +27,10 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private float attackCooldown = 0.5f;
 	private bool canAttack = true;
 
+	[Header("Health Settings")]
+    // Hubungkan script HealthBar yang sudah dibuat melalui Inspector
+    public HealthBar healthBar;
+
 	float horizontalMove = 0f;
 	bool jump = false;
 	bool crouch = false;
@@ -53,6 +57,7 @@ public class CharacterController2D : MonoBehaviour
 	private void Awake()
 	{
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
+		GameStateManager.Instance.OnGameStateChanged += OnGameStateChanged;
 
 		if (OnLandEvent == null)
 			OnLandEvent = new UnityEvent();
@@ -61,7 +66,12 @@ public class CharacterController2D : MonoBehaviour
 			OnCrouchEvent = new BoolEvent();
 	}
 
-	private void Update()
+    void OnDestroy()
+    {
+        GameStateManager.Instance.OnGameStateChanged -= OnGameStateChanged;
+    }
+
+    private void Update()
 	{
 		PlayerAnimation();
 	}
@@ -237,6 +247,37 @@ public class CharacterController2D : MonoBehaviour
 		// animator.ResetTrigger("Attack");
 		canAttack = true;
 	}
+
+	private void OnGameStateChanged(GameState newGameState)
+	{
+		enabled = newGameState == GameState.Gameplay;
+	}
+
+	// private void GamePaused()
+	// {
+	// 	if (isGamePaused)
+    //         return;
+	// 		Debug.Log("lolos pause");
+	// }
+
+	// public void SetPaused(bool paused)
+    // {
+    //     isGamePaused = paused;
+	// 	Debug.Log("Paused");
+	// }
+	private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // Pastikan enemy memiliki tag "Enemy"
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            // Misalnya, saat bertabrakan player mendapatkan damage 10
+            int damage = 10;
+            healthBar.TakeDamage(damage);
+
+            // Kamu juga bisa menambahkan logika lain, seperti animasi terkena damage
+            animator.SetTrigger("DamageTaken");
+        }
+    }
 
 	public void OnLanding()
 	{
