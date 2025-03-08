@@ -11,6 +11,9 @@ public class Enemy : MonoBehaviour
     public Transform pointA;     // Titik patroli pertama
     public Transform pointB;     // Titik patroli kedua
 
+    [Header("Components")]
+    public Animator enemyAnimator;
+
     private int currentHealth;
     private Transform targetPoint;    // Titik yang sedang dituju
     private bool facingRight = true;  // Untuk mengatur arah hadap enemy
@@ -64,12 +67,28 @@ public class Enemy : MonoBehaviour
     // Fungsi untuk menerima damage (misalnya dari serangan player)
     public void TakeDamage(int damageAmount)
     {
-        currentHealth -= damageAmount;
-        Debug.Log(enemyData.enemyName + " menerima damage: " + damageAmount);
+        int effectiveDamage = Mathf.Max(damageAmount - enemyData.defense, 1);
+
+        currentHealth -= effectiveDamage;
+        Debug.Log(enemyData.enemyName + " menerima damage: " + effectiveDamage);
+
+        PlayHitAnimation();
 
         if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+
+    public void PlayHitAnimation()
+    {
+        if (enemyAnimator != null)
+        {
+            enemyAnimator.SetTrigger("Hit");
+        }
+        else
+        {
+            Debug.LogWarning("Animator tidak diassign pada enemy " + gameObject.name);
         }
     }
 

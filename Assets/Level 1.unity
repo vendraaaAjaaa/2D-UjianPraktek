@@ -228,7 +228,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 74341228}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Transform A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -448,8 +448,9 @@ GameObject:
   - component: {fileID: 412984668}
   - component: {fileID: 412984667}
   - component: {fileID: 412984670}
-  m_Layer: 0
-  m_Name: Walk-Base-Sheet_0
+  - component: {fileID: 412984671}
+  m_Layer: 11
+  m_Name: Yarai
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -487,6 +488,7 @@ MonoBehaviour:
   enemyData: {fileID: 11400000, guid: c850db2b87e7b064ea0bed5861a0695c, type: 2}
   pointA: {fileID: 1266225970}
   pointB: {fileID: 992654686}
+  enemyAnimator: {fileID: 412984671}
 --- !u!70 &412984668
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -601,6 +603,27 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!95 &412984671
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412984665}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4b4433f24591ac545a9bb764592ee736, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &421557258
 GameObject:
   m_ObjectHideFlags: 0
@@ -5886,7 +5909,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 619292162}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Transform B
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34293,6 +34316,11 @@ PrefabInstance:
       propertyPath: healthBar
       value: 
       objectReference: {fileID: 1639707237}
+    - target: {fileID: 4372449077666458120, guid: a784766bdfcf34140bdb931f959f624b,
+        type: 3}
+      propertyPath: enemyLayer.m_Bits
+      value: 2048
+      objectReference: {fileID: 0}
     - target: {fileID: 6837100777638129002, guid: a784766bdfcf34140bdb931f959f624b,
         type: 3}
       propertyPath: m_Name

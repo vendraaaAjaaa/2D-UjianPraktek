@@ -12,5 +12,6 @@ public class EnemyData : ScriptableObject
     public int maxHealth = 100;   // Health maksimal enemy
     public int damage = 10;       // Damage yang ditimbulkan enemy
     public float moveSpeed = 2f;  // Kecepatan gerak enemy
+    public int defense = 5;
 
 }

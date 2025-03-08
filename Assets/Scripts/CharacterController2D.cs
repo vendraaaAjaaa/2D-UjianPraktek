@@ -27,8 +27,12 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private float attackCooldown = 0.5f;
 	private bool canAttack = true;
 
+	[Header("Attack Properties")]
+	[SerializeField] private float attackRange = 2f;     // Jarak maksimum untuk mendeteksi musuh
+	[SerializeField] private int attackDamage = 20;      // Damage maksimal yang diberikan jika musuh berada di jarak 0
+	[SerializeField] private LayerMask enemyLayer;       // Layer untuk musuh
+
 	[Header("Health Settings")]
-    // Hubungkan script HealthBar yang sudah dibuat melalui Inspector
     public HealthBar healthBar;
 
 	float horizontalMove = 0f;
@@ -232,13 +236,63 @@ public class CharacterController2D : MonoBehaviour
 		}
 	}
 
+	private void DealDamageToNearestEnemy()
+	{
+		// Tentukan titik asal attack, misalnya di depan player.
+		// Jika ingin offset ke depan, gunakan: transform.position + (m_FacingRight ? Vector3.right : Vector3.left) * offset
+		Vector2 attackOrigin = transform.position;
+		
+		// Cari semua collider pada jarak attackRange yang berada pada enemyLayer
+		Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackOrigin, attackRange, enemyLayer);
+		if(hitEnemies.Length == 0)
+			return; // Tidak ada musuh dalam jangkauan
+
+		// Temukan musuh terdekat
+		Collider2D nearestCollider = null;
+		float minDistance = Mathf.Infinity;
+		foreach (Collider2D col in hitEnemies)
+		{
+			float distance = Vector2.Distance(attackOrigin, col.transform.position);
+			if(distance < minDistance)
+			{
+				minDistance = distance;
+				nearestCollider = col;
+			}
+		}
+
+		if(nearestCollider != null)
+		{
+			Enemy enemy = nearestCollider.GetComponent<Enemy>();
+			if(enemy != null)
+			{
+				// Hitung damage berdasarkan jarak
+				// Jika jarak 0 -> multiplier 1, jika di ujung attackRange -> multiplier 0
+				float damageMultiplier = 1f - (minDistance / attackRange);
+				int finalDamage = Mathf.RoundToInt(attackDamage * damageMultiplier);
+				finalDamage = Mathf.Max(finalDamage, 1); // Minimal 1 damage
+				enemy.TakeDamage(finalDamage);
+				Debug.Log("Menyerang musuh: " + enemy.enemyData.enemyName + " dengan damage: " + finalDamage);
+			}
+		}
+	}
+
+	private void OnDrawGizmosSelected()
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireSphere(transform.position, attackRange);
+	}
+
+
 	private IEnumerator AttackRoutine()
 	{
 		canAttack = false;
 		animator.SetTrigger("Attack");
 
 
-		// Tambahkan logika serangan di sini (misal: enable hitbox)
+		yield return new WaitForSeconds(0.2f);
+    
+		// Panggil fungsi untuk memberikan damage ke musuh terdekat
+		DealDamageToNearestEnemy();
 
 		yield return new WaitForSeconds(attackCooldown);
 
@@ -247,6 +301,7 @@ public class CharacterController2D : MonoBehaviour
 		// animator.ResetTrigger("Attack");
 		canAttack = true;
 	}
+	
 
 	private void OnGameStateChanged(GameState newGameState)
 	{

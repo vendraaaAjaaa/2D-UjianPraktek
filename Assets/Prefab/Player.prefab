@@ -49,7 +49,7 @@ GameObject:
   - component: {fileID: 6974097248137992696}
   m_Layer: 8
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -149,6 +149,12 @@ MonoBehaviour:
   runSpeed: 40
   attackKey: 106
   attackCooldown: 0.5
+  attackRange: 2
+  attackDamage: 20
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  healthBar: {fileID: 0}
   OnLandEvent:
     m_PersistentCalls:
       m_Calls:

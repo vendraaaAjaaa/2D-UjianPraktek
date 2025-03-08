@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Yarai
   m_EditorClassIdentifier: 
   enemyName: Yarai
-  maxHealth: 100
-  damage: 10
+  maxHealth: 20
+  damage: 4
   moveSpeed: 2
+  defense: 1
