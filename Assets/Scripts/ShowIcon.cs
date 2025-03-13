@@ -9,7 +9,7 @@ public class ShowIcon : MonoBehaviour
     [SerializeField] private GameObject controllerIcon; // Icon untuk controller (misalnya dengan label "X")
     [SerializeField] private GameObject keyboardIcon;   // Icon untuk keyboard (misalnya dengan label "J")
     
-    private bool playerInTrigger = false;
+    // private bool playerInTrigger = false;
 
     private void Start()
     {
@@ -23,7 +23,7 @@ public class ShowIcon : MonoBehaviour
         // Pastikan yang masuk adalah player
         if (collision.CompareTag("Player"))
         {
-            playerInTrigger = true;
+            // playerInTrigger = true;
             UpdateIconDisplay();
         }
     }
@@ -42,7 +42,7 @@ public class ShowIcon : MonoBehaviour
         // Saat player keluar dari trigger, sembunyikan kedua icon
         if (collision.CompareTag("Player"))
         {
-            playerInTrigger = false;
+            // playerInTrigger = false;
             if (controllerIcon != null) controllerIcon.SetActive(false);
             if (keyboardIcon != null) keyboardIcon.SetActive(false);
         }
