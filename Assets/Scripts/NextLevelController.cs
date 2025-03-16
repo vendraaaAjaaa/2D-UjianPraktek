@@ -23,6 +23,17 @@ public class NextLevelController : MonoBehaviour
         }
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            playerInRange = true;
+            if (interactPrompt != null)
+                interactPrompt.SetActive(true);
+            Debug.Log(playerInRange + "Mlebu Leng");
+        }
+    }
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
@@ -30,6 +41,7 @@ public class NextLevelController : MonoBehaviour
             playerInRange = false;
             if (interactPrompt != null)
                 interactPrompt.SetActive(false);
+                Debug.Log(playerInRange + "Metu Gok!!");
         }
     }
 

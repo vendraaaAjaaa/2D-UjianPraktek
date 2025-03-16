@@ -4288,6 +4288,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: UI assets Demo (2x)_199
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 928
+        width: 96
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 6, y: 6, z: 6, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af95f15b09134a04e832a0b99de178e5
+      internalID: 2143181949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -4410,6 +4431,7 @@ TextureImporter:
       UI assets Demo (2x)_196: 962385852
       UI assets Demo (2x)_197: 131057882
       UI assets Demo (2x)_198: -391483577
+      UI assets Demo (2x)_199: 2143181949
       UI assets Demo (2x)_2: 1915596961
       UI assets Demo (2x)_20: -1226287195
       UI assets Demo (2x)_21: 234594366
