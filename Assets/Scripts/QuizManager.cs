@@ -28,6 +28,7 @@ public class QuizManager : MonoBehaviour
     /// </summary>
     public void ShowQuiz()
     {
+        GameStateManager.Instance.SetState(GameState.Paused);
         if (quizPanel == null)
         {
             Debug.LogError("QuizPanel belum diassign.");
@@ -105,6 +106,24 @@ public class QuizManager : MonoBehaviour
     public bool IsQuizPassed()
     {
         return quizPassed;
+    }
+
+
+     /// <summary>
+    /// Mengembalikan apakah panel quiz saat ini masih aktif.
+    /// </summary>
+    public bool IsQuizActive()
+    {
+        return quizPanel != null && quizPanel.activeSelf;
+    }
+
+    /// <summary>
+    /// Menyembunyikan panel quiz secara manual (misalnya saat timeout).
+    /// </summary>
+    public void HideQuiz()
+    {
+        if (quizPanel != null)
+            quizPanel.SetActive(false);
     }
 
     /// <summary>

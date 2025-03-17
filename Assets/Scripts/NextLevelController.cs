@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class NextLevelController : MonoBehaviour
 {
@@ -9,9 +10,10 @@ public class NextLevelController : MonoBehaviour
     [SerializeField] private UIPanel uiPanel;           // Script UIPanel untuk menampilkan panel "You Win" beserta bintang
 
     [Header("Settings")]
-    [SerializeField] private float interactKeyDelay = 0.5f; // Delay agar quiz dapat diproses sebelum lanjut
+    [SerializeField] private float quizTimeout = 15f; // Batas waktu quiz (dalam detik)
 
     private bool playerInRange = false;
+    private bool isProcessing = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -30,7 +32,6 @@ public class NextLevelController : MonoBehaviour
             playerInRange = true;
             if (interactPrompt != null)
                 interactPrompt.SetActive(true);
-            Debug.Log(playerInRange + "Mlebu Leng");
         }
     }
 
@@ -41,26 +42,44 @@ public class NextLevelController : MonoBehaviour
             playerInRange = false;
             if (interactPrompt != null)
                 interactPrompt.SetActive(false);
-                Debug.Log(playerInRange + "Metu Gok!!");
         }
     }
 
     private void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && Input.GetKeyDown(KeyCode.E) && !isProcessing)
         {
-            // Jika ada QuizManager, tampilkan quiz terlebih dahulu
+            isProcessing = true; // Mencegah pemanggilan ganda
             if (quizManager != null)
             {
                 quizManager.ShowQuiz();
-                // Setelah delay, lanjutkan perhitungan bintang dan tampilkan UI You Win
-                Invoke("ProceedToNextLevel", interactKeyDelay);
+                // Mulai coroutine untuk menunggu quiz atau timeout
+                StartCoroutine(WaitForQuizOrTimeout(quizTimeout));
             }
             else
             {
                 ProceedToNextLevel();
             }
         }
+    }
+
+    private IEnumerator WaitForQuizOrTimeout(float timeout)
+    {
+        float timer = 0f;
+        // Tunggu selama quiz masih aktif dan waktu belum habis
+        while (quizManager.IsQuizActive() && timer < timeout)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Jika masih aktif (waktu habis), sembunyikan quiz
+        if (quizManager.IsQuizActive())
+        {
+            Debug.Log("Quiz timed out.");
+            quizManager.HideQuiz();
+        }
+        ProceedToNextLevel();
     }
 
     private void ProceedToNextLevel()
