@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.UI;
 
 public class NextLevelController : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class NextLevelController : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private float quizTimeout = 15f; // Batas waktu quiz (dalam detik)
+    [SerializeField] private bool isQuiz = true;        // Jika false, level tidak memerlukan quiz
+
+    [Header("UI Timer")]
+    [SerializeField] private Text quizTimerText;        // Text canvas untuk menampilkan countdown quiz
 
     private bool playerInRange = false;
     private bool isProcessing = false;
@@ -50,7 +55,8 @@ public class NextLevelController : MonoBehaviour
         if (playerInRange && Input.GetKeyDown(KeyCode.E) && !isProcessing)
         {
             isProcessing = true; // Mencegah pemanggilan ganda
-            if (quizManager != null)
+
+            if (isQuiz && quizManager != null)
             {
                 quizManager.ShowQuiz();
                 // Mulai coroutine untuk menunggu quiz atau timeout
@@ -65,15 +71,30 @@ public class NextLevelController : MonoBehaviour
 
     private IEnumerator WaitForQuizOrTimeout(float timeout)
     {
-        float timer = 0f;
-        // Tunggu selama quiz masih aktif dan waktu belum habis
-        while (quizManager.IsQuizActive() && timer < timeout)
+        float timer = timeout;
+
+        // Aktifkan text timer dan tampilkan pesan "QuizTime!!" selama 2 detik
+        if (quizTimerText != null)
         {
-            timer += Time.deltaTime;
+            quizTimerText.gameObject.SetActive(true);
+            quizTimerText.text = "QuizTime!!";
+        }
+        yield return new WaitForSeconds(2f);
+
+        // Sekarang mulai menampilkan countdown dengan format "QuizTimeout: {sisa waktu}"
+        while (quizManager.IsQuizActive() && timer > 0f)
+        {
+            timer -= Time.deltaTime;
+            if (quizTimerText != null)
+                quizTimerText.text = " " + Mathf.Ceil(timer).ToString();
             yield return null;
         }
 
-        // Jika masih aktif (waktu habis), sembunyikan quiz
+        // Setelah loop, sembunyikan text timer
+        if (quizTimerText != null)
+            quizTimerText.gameObject.SetActive(false);
+
+        // Jika quiz masih aktif (waktu habis), sembunyikan quiz
         if (quizManager.IsQuizActive())
         {
             Debug.Log("Quiz timed out.");
@@ -81,6 +102,7 @@ public class NextLevelController : MonoBehaviour
         }
         ProceedToNextLevel();
     }
+
 
     private void ProceedToNextLevel()
     {
@@ -94,7 +116,7 @@ public class NextLevelController : MonoBehaviour
         }
 
         // Kondisi 2: Jika quiz dijawab dengan benar, dapat 1 bintang
-        if (quizManager != null && quizManager.IsQuizPassed())
+        if (isQuiz && quizManager != null && quizManager.IsQuizPassed())
         {
             stars += 1;
         }

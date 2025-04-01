@@ -10787,6 +10787,8 @@ MonoBehaviour:
   interactPrompt: {fileID: 0}
   uiPanel: {fileID: 1541843660}
   quizTimeout: 15
+  isQuiz: 1
+  quizTimerText: {fileID: 621727189}
 --- !u!1 &1700416074
 GameObject:
   m_ObjectHideFlags: 0
