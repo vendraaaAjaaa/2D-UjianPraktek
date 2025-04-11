@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("Enemy Data")]
+     [Header("Enemy Data")]
     public EnemyData enemyData;  // Data enemy yang diassign dari asset EnemyData
 
     [Header("Patrol Settings")]
@@ -14,11 +14,11 @@ public class Enemy : MonoBehaviour
     [Header("Components")]
     public Animator enemyAnimator;
 
-    private int currentHealth;
+    protected int currentHealth;
     private Transform targetPoint;    // Titik yang sedang dituju
-    private bool facingRight = true;  // Untuk mengatur arah hadap enemy
+    private bool facingRight = true;    // Untuk mengatur arah hadap enemy
 
-    private void Start()
+    protected virtual void Start()
     {
         if (enemyData != null)
         {
@@ -38,8 +38,7 @@ public class Enemy : MonoBehaviour
         Patrol();
     }
 
-    // Fungsi patrolling antara pointA dan pointB
-    private void Patrol()
+    protected void Patrol()
     {
         if (pointA == null || pointB == null)
             return;
@@ -55,7 +54,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // Fungsi untuk membalik arah enemy
     private void Flip()
     {
         facingRight = !facingRight;
@@ -64,11 +62,9 @@ public class Enemy : MonoBehaviour
         transform.localScale = scale;
     }
 
-    // Fungsi untuk menerima damage (misalnya dari serangan player)
     public void TakeDamage(int damageAmount)
     {
         int effectiveDamage = Mathf.Max(damageAmount - enemyData.defense, 1);
-
         currentHealth -= effectiveDamage;
         Debug.Log(enemyData.enemyName + " menerima damage: " + effectiveDamage);
 
@@ -92,25 +88,19 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // Fungsi yang dipanggil saat enemy mati
     private void Die()
     {
         Debug.Log(enemyData.enemyName + " telah mati.");
-        // Tambahkan animasi atau efek mati jika diperlukan
         Destroy(gameObject);
     }
 
-    // Fungsi ini akan dipanggil saat enemy bersentuhan dengan player untuk menyerang
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Pastikan player memiliki tag "Player"
         if (collision.gameObject.CompareTag("Player"))
         {
-            // Misalnya, player memiliki script PlayerHealth yang mengatur health
             HealthBar playerHealth = collision.gameObject.GetComponent<HealthBar>();
             if (playerHealth != null)
             {
-                // Gunakan nilai damage dari enemyData, sehingga tiap enemy bisa memiliki damage berbeda
                 playerHealth.TakeDamage(enemyData.damage);
             }
         }
