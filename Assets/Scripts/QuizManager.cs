@@ -124,6 +124,7 @@ public class QuizManager : MonoBehaviour
     {
         if (quizPanel != null)
             quizPanel.SetActive(false);
+        GameStateManager.Instance.SetState(GameState.Gameplay);
     }
 
     /// <summary>

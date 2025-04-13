@@ -48,4 +48,12 @@ public class EnemyPatrolDetect : Enemy
             }
         }
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        // Set warna Gizmo misalnya kuning
+        Gizmos.color = Color.yellow;
+        // Gambar sphere dengan center di transform.position dan radius detectionRadius
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    }
 }

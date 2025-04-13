@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Kecing
   m_EditorClassIdentifier: 
   enemyName: Kecing
-  maxHealth: 8
-  damage: 4
-  moveSpeed: 4
-  defense: 2
+  maxHealth: 6
+  damage: 8
+  moveSpeed: 8
+  defense: 3
