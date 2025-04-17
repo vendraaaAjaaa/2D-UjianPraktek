@@ -33,7 +33,7 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private LayerMask enemyLayer;       // Layer untuk musuh
 
 	[Header("Health Settings")]
-    public HealthBar healthBar;
+	public HealthBar healthBar;
 
 	float horizontalMove = 0f;
 	bool jump = false;
@@ -70,12 +70,12 @@ public class CharacterController2D : MonoBehaviour
 			OnCrouchEvent = new BoolEvent();
 	}
 
-    void OnDestroy()
-    {
-        GameStateManager.Instance.OnGameStateChanged -= OnGameStateChanged;
-    }
+	void OnDestroy()
+	{
+		GameStateManager.Instance.OnGameStateChanged -= OnGameStateChanged;
+	}
 
-    private void Update()
+	private void Update()
 	{
 		PlayerAnimation();
 	}
@@ -241,10 +241,10 @@ public class CharacterController2D : MonoBehaviour
 		// Tentukan titik asal attack, misalnya di depan player.
 		// Jika ingin offset ke depan, gunakan: transform.position + (m_FacingRight ? Vector3.right : Vector3.left) * offset
 		Vector2 attackOrigin = transform.position;
-		
+
 		// Cari semua collider pada jarak attackRange yang berada pada enemyLayer
 		Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackOrigin, attackRange, enemyLayer);
-		if(hitEnemies.Length == 0)
+		if (hitEnemies.Length == 0)
 			return; // Tidak ada musuh dalam jangkauan
 
 		// Temukan musuh terdekat
@@ -253,17 +253,17 @@ public class CharacterController2D : MonoBehaviour
 		foreach (Collider2D col in hitEnemies)
 		{
 			float distance = Vector2.Distance(attackOrigin, col.transform.position);
-			if(distance < minDistance)
+			if (distance < minDistance)
 			{
 				minDistance = distance;
 				nearestCollider = col;
 			}
 		}
 
-		if(nearestCollider != null)
+		if (nearestCollider != null)
 		{
 			Enemy enemy = nearestCollider.GetComponent<Enemy>();
-			if(enemy != null)
+			if (enemy != null)
 			{
 				// Hitung damage berdasarkan jarak
 				// Jika jarak 0 -> multiplier 1, jika di ujung attackRange -> multiplier 0
@@ -290,7 +290,7 @@ public class CharacterController2D : MonoBehaviour
 
 
 		yield return new WaitForSeconds(0.2f);
-    
+
 		// Panggil fungsi untuk memberikan damage ke musuh terdekat
 		DealDamageToNearestEnemy();
 
@@ -301,7 +301,7 @@ public class CharacterController2D : MonoBehaviour
 		// animator.ResetTrigger("Attack");
 		canAttack = true;
 	}
-	
+
 
 	private void OnGameStateChanged(GameState newGameState)
 	{
@@ -311,28 +311,28 @@ public class CharacterController2D : MonoBehaviour
 	// private void GamePaused()
 	// {
 	// 	if (isGamePaused)
-    //         return;
+	//         return;
 	// 		Debug.Log("lolos pause");
 	// }
 
 	// public void SetPaused(bool paused)
-    // {
-    //     isGamePaused = paused;
+	// {
+	//     isGamePaused = paused;
 	// 	Debug.Log("Paused");
 	// }
 	private void OnCollisionEnter2D(Collision2D collision)
-    {
-        // Pastikan enemy memiliki tag "Enemy"
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            // Misalnya, saat bertabrakan player mendapatkan damage 10
-            int damage = 10;
-            healthBar.TakeDamage(damage);
+	{
+		// Pastikan enemy memiliki tag "Enemy"
+		if (collision.gameObject.CompareTag("Enemy"))
+		{
+			// Misalnya, saat bertabrakan player mendapatkan damage 10
+			int damage = 10;
+			healthBar.TakeDamage(damage);
 
-            // Kamu juga bisa menambahkan logika lain, seperti animasi terkena damage
-            animator.SetTrigger("DamageTaken");
-        }
-    }
+			// Kamu juga bisa menambahkan logika lain, seperti animasi terkena damage
+			animator.SetTrigger("DamageTaken");
+		}
+	}
 
 	public void OnLanding()
 	{
@@ -343,5 +343,10 @@ public class CharacterController2D : MonoBehaviour
 	public void OnCrouching(bool isCrouching)
 	{
 		animator.SetBool("IsCrouching", isCrouching);
+	}
+	
+	public void BoostDamage(int amount)
+	{
+		attackDamage += amount;
 	}
 }

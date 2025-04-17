@@ -149,8 +149,8 @@ MonoBehaviour:
   runSpeed: 40
   attackKey: 106
   attackCooldown: 0.5
-  attackRange: 2
-  attackDamage: 20
+  attackRange: 2.5
+  attackDamage: 25
   enemyLayer:
     serializedVersion: 2
     m_Bits: 2048
