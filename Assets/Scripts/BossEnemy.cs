@@ -156,14 +156,30 @@ public class BossEnemy : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int damageAmount)
     {
-        int effective = Mathf.Max(amount - bossData.defense, 1);
-        currentHealth = Mathf.Clamp(currentHealth - effective, 0, bossData.maxHealth);
-        if (healthSlider != null)
-            healthSlider.value = currentHealth;
+        int effectiveDamage = Mathf.Max(damageAmount - bossData.defense, 1);
+        currentHealth -= effectiveDamage;
+        Debug.Log(bossData.enemyName + " menerima damage: " + effectiveDamage);
+
+        PlayHitAnimation();
+
         if (currentHealth <= 0)
+        {
             Die();
+        }
+    }
+
+    public void PlayHitAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("Hit");
+        }
+        else
+        {
+            Debug.LogWarning("Animator tidak diassign pada enemy " + gameObject.name);
+        }
     }
 
     private void Die()
