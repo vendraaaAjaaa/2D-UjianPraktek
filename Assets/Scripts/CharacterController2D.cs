@@ -273,6 +273,18 @@ public class CharacterController2D : MonoBehaviour
 				enemy.TakeDamage(finalDamage);
 				Debug.Log("Menyerang musuh: " + enemy.enemyData.enemyName + " dengan damage: " + finalDamage);
 			}
+
+			BossEnemy boss = nearestCollider.GetComponent<BossEnemy>();
+			if (boss != null)
+			{
+				// Hitung damage berdasarkan jarak
+				// Jika jarak 0 -> multiplier 1, jika di ujung attackRange -> multiplier 0
+				float damageMultiplier = 1f - (minDistance / attackRange);
+				int finalDamage = Mathf.RoundToInt(attackDamage * damageMultiplier);
+				finalDamage = Mathf.Max(finalDamage, 1); // Minimal 1 damage
+				boss.TakeDamage(finalDamage);
+				Debug.Log("Menyerang musuh: " + enemy.enemyData.enemyName + " dengan damage: " + finalDamage);
+			}
 		}
 	}
 
