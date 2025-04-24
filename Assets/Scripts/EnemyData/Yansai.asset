@@ -16,4 +16,4 @@ MonoBehaviour:
   maxHealth: 15
   damage: 6
   moveSpeed: 4
-  defense: 3
+  defense: 2

@@ -17,8 +17,11 @@ public class BossEnemy : MonoBehaviour
     private Vector3 lastInsidePosition;
 
     [Header("Cinemachine Cameras")]
-    public CinemachineVirtualCamera normalCam;   // Virtual Camera for normal gameplay
-    public CinemachineVirtualCamera battleCam;   // Virtual Camera for boss arena (with Confiner)
+    public CinemachineVirtualCamera normalCam;
+    public CinemachineVirtualCamera battleCam;
+
+    [Header("Arena Walls (Block exit)")]
+    public GameObject arenaWalls;
 
     [Header("Attack Settings")]
     public float meleeRange = 2f;
@@ -34,15 +37,20 @@ public class BossEnemy : MonoBehaviour
     public Animator animator;
     private static readonly int RangedAttackTrigger = Animator.StringToHash("RangedAttack");
     private static readonly int MeleeAttackTrigger = Animator.StringToHash("MeleeAttack");
+    private static readonly int DieTrigger = Animator.StringToHash("Die");
 
     [Header("Health Bar UI")]
     public GameObject healthBarUI;
     public Slider healthSlider;
 
+    [Header("Final GameObject")]
+    public GameObject finalObject;
+
     private float currentHealth;
     private float meleeTimer;
     private float rangedTimer;
     private bool inBattle = false;
+    private bool facingRight = true;
 
     private void Awake()
     {
@@ -50,21 +58,23 @@ public class BossEnemy : MonoBehaviour
         currentHealth = bossData ? bossData.maxHealth : 100;
         meleeTimer = meleeCooldown;
         rangedTimer = 0f;
+        finalObject.SetActive(false);
 
         if (healthBarUI != null)
             healthBarUI.SetActive(false);
-
         if (healthSlider != null)
         {
             healthSlider.maxValue = currentHealth;
             healthSlider.value = currentHealth;
         }
-
-        // Ensure battleCam is disabled priority at start
         if (normalCam != null && battleCam != null)
         {
             normalCam.Priority = 10;
             battleCam.Priority = 0;
+        }
+        if (arenaWalls != null)
+        {
+            arenaWalls.SetActive(false);
         }
     }
 
@@ -73,16 +83,16 @@ public class BossEnemy : MonoBehaviour
         if (!inBattle && other.CompareTag("Player"))
         {
             inBattle = true;
-
-            // Show health UI
             if (healthBarUI != null)
                 healthBarUI.SetActive(true);
-
-            // Switch to battle cinemachine camera
             if (normalCam != null && battleCam != null)
-            {
                 battleCam.Priority = normalCam.Priority + 1;
+            if (arenaWalls != null)
+            {
+                arenaWalls.SetActive(true);
             }
+            AudioManager.instance.Play("BossMusic");
+            AudioManager.instance.Stop("BGM");
         }
     }
 
@@ -102,6 +112,9 @@ public class BossEnemy : MonoBehaviour
     {
         if (!inBattle || player == null || bossData == null)
             return;
+
+        // Flip to face player
+        FlipTowardsPlayer();
 
         meleeTimer += Time.deltaTime;
         rangedTimer += Time.deltaTime;
@@ -123,6 +136,34 @@ public class BossEnemy : MonoBehaviour
         }
     }
 
+    public void PlayHitAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("Hit");
+        }
+        else
+        {
+            Debug.LogWarning("Animator tidak diassign pada enemy " + gameObject.name);
+        }
+    }
+
+    private void FlipTowardsPlayer()
+    {
+        if (player == null) return;
+        bool shouldFaceRight = player.position.x > transform.position.x;
+        if (shouldFaceRight != facingRight)
+            Flip();
+    }
+
+    private void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
+
     private void ChasePlayer()
     {
         transform.position = Vector2.MoveTowards(
@@ -135,7 +176,7 @@ public class BossEnemy : MonoBehaviour
     {
         if (animator != null)
             animator.SetTrigger(MeleeAttackTrigger);
-        HealthBar hb = player.GetComponent<HealthBar>();
+        var hb = player.GetComponent<HealthBar>();
         if (hb != null)
             hb.TakeDamage(bossData.damage);
     }
@@ -156,44 +197,36 @@ public class BossEnemy : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damageAmount)
+    public void TakeDamage(int amount)
     {
-        int effectiveDamage = Mathf.Max(damageAmount - bossData.defense, 1);
-        currentHealth -= effectiveDamage;
-        Debug.Log(bossData.enemyName + " menerima damage: " + effectiveDamage);
-
+        int effective = Mathf.Max(amount - bossData.defense, 1);
+        currentHealth = Mathf.Clamp(currentHealth - effective, 0, bossData.maxHealth);
+        Debug.Log(bossData.enemyName + " menerima damage: " + effective);
         PlayHitAnimation();
-
+        if (healthSlider != null)
+            healthSlider.value = currentHealth;
         if (currentHealth <= 0)
-        {
-            Die();
-        }
+            StartCoroutine(DeathRoutine());
     }
 
-    public void PlayHitAnimation()
+    private IEnumerator DeathRoutine()
     {
-        if (animator != null)
-        {
-            animator.SetTrigger("Hit");
-        }
-        else
-        {
-            Debug.LogWarning("Animator tidak diassign pada enemy " + gameObject.name);
-        }
-    }
-
-    private void Die()
-    {
+        AudioManager.instance.Stop("BossMusic");
+        AudioManager.instance.Play("BGM");
+        finalObject.SetActive(true);
         inBattle = false;
+        if (animator != null)
+            animator.SetTrigger(DieTrigger);
+        var state = animator.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitForSeconds(state.length);
         if (healthBarUI != null)
             healthBarUI.SetActive(false);
-
-        // Switch back to normal camera
-        if (normalCam != null && battleCam != null)
-        {
+        if (battleCam != null && normalCam != null)
             battleCam.Priority = 0;
+        if (arenaWalls != null)
+        {
+            arenaWalls.SetActive(false);
         }
-
         Destroy(gameObject);
     }
 }

@@ -18,6 +18,7 @@ public class GameOverManager : MonoBehaviour
     {
         if (gameOverPanel != null)
         {
+            AudioManager.instance.Play("Lose");
             gameOverPanel.SetActive(true);
             GameStateManager.Instance.SetState(GameState.Paused);
         }

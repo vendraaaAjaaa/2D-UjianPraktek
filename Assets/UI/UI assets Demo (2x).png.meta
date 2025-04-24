@@ -1521,12 +1521,12 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 96
-        y: 736
-        width: 32
-        height: 32
+        y: 738
+        width: 96
+        height: 30
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 0, y: 0, z: 0, w: 2}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -4318,7 +4318,7 @@ TextureImporter:
         width: 96
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 4, y: 0, z: 4, w: 4}
       outline: []
       physicsShape: []
@@ -4326,6 +4326,27 @@ TextureImporter:
       bones: []
       spriteID: f86530c36791ccf48bf8ead0044cf410
       internalID: 786662069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI assets Demo (2x)_201
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 736
+        width: 96
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 2, y: 2, z: 2, w: 4}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d2d388e1beda16418dc92094eba07f8
+      internalID: 1045705438
       vertices: []
       indices: 
       edges: []
@@ -4456,6 +4477,7 @@ TextureImporter:
       UI assets Demo (2x)_2: 1915596961
       UI assets Demo (2x)_20: -1226287195
       UI assets Demo (2x)_200: 786662069
+      UI assets Demo (2x)_201: 1045705438
       UI assets Demo (2x)_21: 234594366
       UI assets Demo (2x)_22: 887516990
       UI assets Demo (2x)_23: -2093504365

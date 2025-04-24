@@ -91,6 +91,17 @@ public class ChestController : MonoBehaviour
         var cc = player.GetComponent<CharacterController2D>();
 
         bool giveHealth = Random.value < 0.5f;
+        if (hb == null)
+        {
+            // Komponen tidak ditemukan → log error
+            Debug.LogError($"{name}: HealthBar not found on this GameObject!");
+        }
+        else
+        {
+            // Komponen ditemukan → log success
+            Debug.Log($"{name}: HealthBar successfully retrieved.");
+        }
+        
         if (giveHealth && hb != null)
         {
             // buff health by sending negative damage

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Daze
   m_EditorClassIdentifier: 
   enemyName: Daze
-  maxHealth: 200
+  maxHealth: 50
   damage: 15
   moveSpeed: 4
   defense: 5

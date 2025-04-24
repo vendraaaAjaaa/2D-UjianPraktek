@@ -182,21 +182,24 @@ public class CharacterController2D : MonoBehaviour
 		bool wasGrounded = m_Grounded;
 		m_Grounded = false;
 		animator.SetBool("isGrounded", false);
-		Debug.Log(m_Grounded);
 
-		// The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-		// This can be done using layers instead but Sample Assets will not overwrite your project settings.
-		Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+		Collider2D[] colliders = Physics2D.OverlapCircleAll(
+			m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+
 		for (int i = 0; i < colliders.Length; i++)
 		{
-			if (colliders[i].gameObject != gameObject)
+			Collider2D col = colliders[i];
+			// Lewatkan collider trigger (misal battleZone)
+			if (col.isTrigger) 
+				continue;
+
+			if (col.gameObject != gameObject)
 			{
 				m_Grounded = true;
 				animator.SetBool("isGrounded", true);
 				if (!wasGrounded)
-				{
 					OnLandEvent.Invoke();
-				}
+				break;
 			}
 		}
 	}
@@ -219,6 +222,7 @@ public class CharacterController2D : MonoBehaviour
 			isJumping = true;
 			jump = true;
 			animator.SetTrigger("IsJumping");
+			AudioManager.instance.Play("Jump");
 		}
 
 		if (Input.GetButtonDown("Crouch"))
@@ -233,6 +237,7 @@ public class CharacterController2D : MonoBehaviour
 		{
 			StartCoroutine(AttackRoutine());
 			animator.SetBool("canAttack", true);
+			AudioManager.instance.Play("Attack");
 		}
 	}
 
@@ -283,7 +288,7 @@ public class CharacterController2D : MonoBehaviour
 				int finalDamage = Mathf.RoundToInt(attackDamage * damageMultiplier);
 				finalDamage = Mathf.Max(finalDamage, 1); // Minimal 1 damage
 				boss.TakeDamage(finalDamage);
-				Debug.Log("Menyerang musuh: " + enemy.enemyData.enemyName + " dengan damage: " + finalDamage);
+				Debug.Log("Menyerang musuh: " + boss.bossData.enemyName + " dengan damage: " + finalDamage);
 			}
 		}
 	}

@@ -79,10 +79,13 @@ public class QuizManager : MonoBehaviour
     private void OnOptionSelected(int selectedIndex)
     {
         QuizData currentQuiz = quizDatas[currentQuizIndex];
+        
         if (selectedIndex == currentQuiz.correctAnswerIndex)
         {
             quizPassed = true;
+            currentQuiz.isPassed = true;
             Debug.Log("Quiz passed!");
+            AudioManager.instance.Play("Win");
         }
         else
         {
@@ -90,13 +93,9 @@ public class QuizManager : MonoBehaviour
             Debug.Log("Quiz failed!");
         }
 
-        // Sembunyikan panel quiz setelah memilih jawaban
-        quizPanel.SetActive(false);
-
-        // Jika Anda ingin menggunakan lebih dari satu quiz secara berurutan,
-        // Anda bisa menambahkan logika untuk menaikkan indeks quiz.
-        // Contoh:
-        // currentQuizIndex++;
+        currentQuiz.isDone = true;        // Tandai quiz selesai
+        currentQuizIndex++;               // Naikkan index ke quiz berikutnya
+        quizPanel.SetActive(false);       // Tutup panel setelah menjawab
     }
 
     /// <summary>
@@ -109,7 +108,7 @@ public class QuizManager : MonoBehaviour
     }
 
 
-     /// <summary>
+    /// <summary>
     /// Mengembalikan apakah panel quiz saat ini masih aktif.
     /// </summary>
     public bool IsQuizActive()
@@ -124,7 +123,7 @@ public class QuizManager : MonoBehaviour
     {
         if (quizPanel != null)
             quizPanel.SetActive(false);
-        GameStateManager.Instance.SetState(GameState.Gameplay);
+        // GameStateManager.Instance.SetState(GameState.Gameplay);
     }
 
     /// <summary>
@@ -136,5 +135,16 @@ public class QuizManager : MonoBehaviour
         quizPassed = false;
         if (quizPanel != null)
             quizPanel.SetActive(false);
+    }
+    
+    public void ResetAllQuizData()
+    {
+        foreach (QuizData quiz in quizDatas)
+        {
+            quiz.isDone = false;
+            quiz.isPassed = false;
+        }
+
+        Debug.Log("Semua data quiz telah di-reset.");
     }
 }
