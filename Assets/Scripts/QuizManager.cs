@@ -79,7 +79,7 @@ public class QuizManager : MonoBehaviour
     private void OnOptionSelected(int selectedIndex)
     {
         QuizData currentQuiz = quizDatas[currentQuizIndex];
-        
+
         if (selectedIndex == currentQuiz.correctAnswerIndex)
         {
             quizPassed = true;
@@ -123,7 +123,8 @@ public class QuizManager : MonoBehaviour
     {
         if (quizPanel != null)
             quizPanel.SetActive(false);
-        // GameStateManager.Instance.SetState(GameState.Gameplay);
+        GameStateManager.Instance.SetState(GameState.Gameplay);
+
     }
 
     /// <summary>
@@ -136,7 +137,7 @@ public class QuizManager : MonoBehaviour
         if (quizPanel != null)
             quizPanel.SetActive(false);
     }
-    
+
     public void ResetAllQuizData()
     {
         foreach (QuizData quiz in quizDatas)

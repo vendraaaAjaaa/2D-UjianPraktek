@@ -57,4 +57,19 @@ public class UIPanel : MonoBehaviour
             nextLevelPanel.SetActive(false);
         }
     }
+
+    public void OnPauseButtonClicked()
+    {
+
+        GameStateManager.Instance.SetState(GameState.Paused);
+        pauseMenuPanel.SetActive(true);
+        AudioManager.instance.Play("Click");
+    }
+
+    public void OnResumeButtonClicked()
+    {
+        GameStateManager.Instance.SetState(GameState.Gameplay);
+        pauseMenuPanel.SetActive(false);
+        AudioManager.instance.Play("Click");
+    }
 }

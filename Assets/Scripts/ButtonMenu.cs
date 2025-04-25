@@ -44,4 +44,9 @@ public class ButtonMenu : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
         }
     }
+
+    public void OnAplicationQuit()
+    {
+        Application.Quit();
+    }
 }
